@@ -17,11 +17,52 @@ function Control() {
 }
 
 Control.prototype.handleKey = function(event, isDown) {
-    //e = translateEvent(event, isDown);
-    //this.tanks[this.you].update(e);
+    e = this.translateEvent(event, isDown);
+    this.tanks[this.id].update(e);
 }
 
-Control.prototype.probe = function() {
+Control.prototype.translateEvent = function(event, isDown) {
+    var e = {};
+
+    e["id"] = this.id;
+    e["down"] = isDown;
+
+    // Thruster Control
+    switch(event.keyCode) {
+        case 37:    // left
+        case 65:    // A
+
+            e["yaw"] = 1;
+            e["thrust"] = 0;
+            break;
+
+        case 39:    // right
+        case 68:    // D
+
+            e["yaw"] = -1;
+            e["thrust"] = 0;
+            break;
+
+        case 38:    // up
+        case 87:    // W
+
+            e["yaw"] = 0;
+            e["thrust"] = 1;
+            break;
+
+        case 40:    // down
+        case 83:    // S
+
+            e["yaw"] = 0;
+            e["thrust"] = -1;
+            break;
+
+        default:
+            e["yaw"] = 0;
+            e["thrust"] = 0;
+    }
+
+    return e;
 }
 
 Control.prototype.tick = function() {
@@ -44,10 +85,11 @@ Control.prototype.start = function() {
     this.render.initGL(this.canvasId);
 
     // Bind Controls
+    var control = this;
     document.onkeydown = function(event) {
-        return Control.prototype.handleKey(event, true); };
+        return control.handleKey(event, true); };
     document.onkeyup = function(event) {
-        return Control.prototype.handleKey(event, false); };
+        return control.handleKey(event, false); };
 
     // Initialize Object Data
     this.map = new Map();

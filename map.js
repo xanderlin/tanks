@@ -46,9 +46,9 @@ Map.prototype.drawScene = function(render){
 
 // MAP RENDERING DATA
 Map.cubeVertexPositions = function() {
-    var width = 10.0;
+    var width = 40.0;
     var height = 0.1;
-    var depth = 10.0;
+    var depth = 40.0;
 
     var vertices = [
         // Front face

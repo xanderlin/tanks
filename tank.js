@@ -2,6 +2,11 @@ function Tank() {
     this.rPyramid = 0;
     this.rCube = 0;
 
+    this.speed = 0;
+    this.yaw = 0;
+
+    this.yawRate = 0;
+
     this.xPos = 0;
     this.yPos = 0;
     this.zPos = 0;
@@ -9,8 +14,14 @@ function Tank() {
     this.lastTime = 0;
 }
 
-Tank.prototype.update = function() {
-    // move this in
+Tank.prototype.update = function(e) {
+    if (e["yaw"] != 0) {
+        this.yawRate = e["down"] ? 0.1 * e["yaw"] : 0;
+    }
+
+    if (e["thrust"] != 0) {
+        this.speed = e["down"] ? 0.03 * e["thrust"] : 0;
+    }
 }
 
 Tank.prototype.initBuffers = function(render){
@@ -85,14 +96,23 @@ Tank.prototype.drawScene = function(render){
     render.mvPopMatrix();
 }
 
-Tank.prototype.animate = function() {
+Tank.prototype.animate = function(render) {
     var timeNow = new Date().getTime();
+
     if (this.lastTime != 0) {
         var elapsed = timeNow - this.lastTime;
 
+        if (this.speed != 0) {
+            this.xPos -= Math.sin(render.degToRad(this.yaw)) * this.speed * elapsed;
+            this.zPos -= Math.cos(render.degToRad(this.yaw)) * this.speed * elapsed;
+        }
+
+        this.yaw += this.yawRate * elapsed;
+
         this.rPyramid += (90 * elapsed) / 1000.0;
-        this.rCube -= (75 * elapsed) / 1000.0;
+        this.rCube = this.yaw;
     }
+
     this.lastTime = timeNow;
 }
 
