@@ -12,20 +12,26 @@
 function Control() {
     this.canvasId = "tanks-canvas";
 
-    this.id = "id";
+    this.id = "tank_0";
+    this.game_id = 11;
+
     this.tanks = {};
+    this.processed = {};
 }
 
 Control.prototype.handleKey = function(event, isDown) {
     e = this.translateEvent(event, isDown);
-    this.tanks[this.id].update(e);
+
+    this.tanks["echo"].update(e);
+    this.network.broadcast(e);
 }
 
 Control.prototype.translateEvent = function(event, isDown) {
     var e = {};
 
-    e["id"] = this.id;
+    e["tank_id"] = this.id;
     e["down"] = isDown;
+    e["game_id"] = this.game_id;
 
     // Thruster Control
     switch(event.keyCode) {
@@ -65,6 +71,20 @@ Control.prototype.translateEvent = function(event, isDown) {
     return e;
 }
 
+Control.prototype.update = function(events) {
+    for (var i = 0; i < events.length; i++) {
+        var e = events[i];
+
+        if (!(e._id in this.processed)) {
+            this.processed[e._id] = true;
+            this.tanks[e.tank_id].update(e);
+        }
+    }
+
+    var control = this;
+    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
+}
+
 Control.prototype.tick = function() {
     // Bind display refresh
     var control = this;
@@ -76,7 +96,9 @@ Control.prototype.tick = function() {
     this.map.drawScene(this.render);
 
     this.tanks[this.id].drawScene(this.render);
+    this.tanks["echo"].drawScene(this.render);
     this.tanks[this.id].animate(this.render);
+    this.tanks["echo"].animate(this.render);
 }
 
 Control.prototype.start = function() {
@@ -94,14 +116,23 @@ Control.prototype.start = function() {
     // Initialize Object Data
     this.map = new Map();
     this.tanks[this.id] = new Tank(this.id);
+    this.tanks["echo"] = new Tank(this.id);
+
+    // Connect to the Network
+    this.network = new Network();
 
     // Initialize Object Buffers 
     this.render.initShaders();
 
     this.map.initBuffers(this.render);
     this.tanks[this.id].initBuffers(this.render);
+    this.tanks["echo"].initBuffers(this.render);
 
     this.render.initCanvas();
+
+    // Start chattering
+    var control = this;
+    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
 
     // Start ticking
     this.tick();

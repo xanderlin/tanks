@@ -20,7 +20,7 @@ Tank.prototype.update = function(e) {
     }
 
     if (e["thrust"] != 0) {
-        this.speed = e["down"] ? 0.03 * e["thrust"] : 0;
+        this.speed = e["down"] ? 0.003 * e["thrust"] : 0;
     }
 }
 
