@@ -1,6 +1,6 @@
-function Tank() {
-    this.rPyramid = 0;
-    this.rCube = 0;
+function Tank(render) {
+    this.rTurret = 0;
+    this.rBody = 0;
 
     this.speed = 0;
     this.yaw = 0;
@@ -12,6 +12,8 @@ function Tank() {
     this.zPos = 0;
 
     this.lastTime = 0;
+
+    this.initBuffers(render);
 }
 
 Tank.prototype.update = function(e) {
@@ -20,20 +22,20 @@ Tank.prototype.update = function(e) {
 }
 
 Tank.prototype.initBuffers = function(render){
-    this.pyramidVertexPositionBuffer = render.initBuffer(
-        Tank.pyramidVertexPositions(), render.gl.ARRAY_BUFFER, 3, 12);
+    this.turretVertexPositionBuffer = render.initBuffer(
+        Tank.turretVertexPositions(), render.gl.ARRAY_BUFFER, 3, 12);
 
-    this.pyramidVertexColorBuffer = render.initBuffer(
-        Tank.pyramidVertexColors(), render.gl.ARRAY_BUFFER, 4, 12);
+    this.turretVertexColorBuffer = render.initBuffer(
+        Tank.turretVertexColors(), render.gl.ARRAY_BUFFER, 4, 12);
 
-    this.cubeVertexPositionBuffer = render.initBuffer(
-        Tank.cubeVertexPositions(), render.gl.ARRAY_BUFFER, 3, 24);
+    this.bodyVertexPositionBuffer = render.initBuffer(
+        Tank.bodyVertexPositions(), render.gl.ARRAY_BUFFER, 3, 24);
 
-    this.cubeVertexColorBuffer = render.initBuffer(
-        Tank.cubeVertexColors(), render.gl.ARRAY_BUFFER, 4, 24);
+    this.bodyVertexColorBuffer = render.initBuffer(
+        Tank.bodyVertexColors(), render.gl.ARRAY_BUFFER, 4, 24);
 
-    this.cubeVertexIndexBuffer = render.initBuffer(
-        Tank.cubeVertexIndices(), render.gl.ELEMENT_ARRAY_BUFFER, 1, 36);
+    this.bodyVertexIndexBuffer = render.initBuffer(
+        Tank.bodyVertexIndices(), render.gl.ELEMENT_ARRAY_BUFFER, 1, 36);
 }
 
 Tank.prototype.drawScene = function(render){
@@ -41,12 +43,12 @@ Tank.prototype.drawScene = function(render){
     var gl = render.gl;
     var shaderProgram = render.shaderProgram;
 
-    var pyramidVertexPositionBuffer = this.pyramidVertexPositionBuffer;
-    var pyramidVertexColorBuffer = this.pyramidVertexColorBuffer;
+    var turretVertexPositionBuffer = this.turretVertexPositionBuffer;
+    var turretVertexColorBuffer = this.turretVertexColorBuffer;
 
-    var cubeVertexPositionBuffer = this.cubeVertexPositionBuffer;
-    var cubeVertexColorBuffer = this.cubeVertexColorBuffer;
-    var cubeVertexIndexBuffer = this.cubeVertexIndexBuffer;
+    var bodyVertexPositionBuffer = this.bodyVertexPositionBuffer;
+    var bodyVertexColorBuffer = this.bodyVertexColorBuffer;
+    var bodyVertexIndexBuffer = this.bodyVertexIndexBuffer;
 
     // Save
     render.mvPushMatrix();
@@ -58,17 +60,17 @@ Tank.prototype.drawScene = function(render){
     // Setup
     render.mvPushMatrix();
     mat4.translate(render.mvMatrix, [0.0, 0.5, 0.0]);
-    mat4.rotate(render.mvMatrix, render.degToRad(this.rPyramid), [0, 1, 0]);
+    mat4.rotate(render.mvMatrix, render.degToRad(this.rTurret), [0, 1, 0]);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, pyramidVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, turretVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, turretVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, pyramidVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, turretVertexColorBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, turretVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     // Draw
     render.setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems);
+    gl.drawArrays(gl.TRIANGLES, 0, turretVertexPositionBuffer.numItems);
 
     render.mvPopMatrix();
 
@@ -77,19 +79,19 @@ Tank.prototype.drawScene = function(render){
 
     // Setup
     render.mvPushMatrix();
-    mat4.rotate(render.mvMatrix, render.degToRad(this.rCube), [0, 1, 0]);
+    mat4.rotate(render.mvMatrix, render.degToRad(this.rBody), [0, 1, 0]);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bodyVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, bodyVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bodyVertexColorBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, bodyVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bodyVertexIndexBuffer);
 
     // Draw
     render.setMatrixUniforms();
-    gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, bodyVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
     render.mvPopMatrix();
 
@@ -110,15 +112,15 @@ Tank.prototype.animate = function(render) {
 
         this.yaw += this.yawRate * elapsed;
 
-        this.rPyramid += (90 * elapsed) / 1000.0;
-        this.rCube = this.yaw;
+        this.rTurret += (90 * elapsed) / 1000.0;
+        this.rBody = this.yaw;
     }
 
     this.lastTime = timeNow;
 }
 
 // TANK RENDERING DATA
-Tank.pyramidVertexPositions = function() {
+Tank.turretVertexPositions = function() {
     var width = 1.0;
     var height = 0.25;
     var depth = 1.0;
@@ -148,7 +150,7 @@ Tank.pyramidVertexPositions = function() {
     return new Float32Array(vertices);
 }
 
-Tank.pyramidVertexColors = function() {
+Tank.turretVertexColors = function() {
     var colors = [
         // Front face
         1.0, 0.0, 0.0, 1.0,
@@ -174,7 +176,7 @@ Tank.pyramidVertexColors = function() {
     return new Float32Array(colors);
 }
 
-Tank.cubeVertexPositions = function() {
+Tank.bodyVertexPositions = function() {
     var width = 1.0;
     var height = 0.25;
     var depth = 1.5;
@@ -220,7 +222,7 @@ Tank.cubeVertexPositions = function() {
     return new Float32Array(vertices);
 }
 
-Tank.cubeVertexColors = function() {
+Tank.bodyVertexColors = function() {
     var colors = [
         [1.0, 0.0, 0.0, 1.0], // Front face
         [1.0, 1.0, 0.0, 1.0], // Back face
@@ -240,8 +242,8 @@ Tank.cubeVertexColors = function() {
     return new Float32Array(unpackedColors);
 }
 
-Tank.cubeVertexIndices = function() {
-    var cubeVertexIndices = [
+Tank.bodyVertexIndices = function() {
+    var bodyVertexIndices = [
         0, 1, 2,      0, 2, 3,    // Front face
         4, 5, 6,      4, 6, 7,    // Back face
         8, 9, 10,     8, 10, 11,  // Top face
@@ -250,5 +252,5 @@ Tank.cubeVertexIndices = function() {
         20, 21, 22,   20, 22, 23  // Left face
     ];
 
-    return new Uint16Array(cubeVertexIndices);
+    return new Uint16Array(bodyVertexIndices);
 }

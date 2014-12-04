@@ -19,25 +19,26 @@ function Control() {
     this.keys = {};
 
     // Connect to the Network
-    this.network = new Network();
+    this.network = new Network(this);
 
     // Set id...?
-    this.game_id = 20;
-    this.id = "tank_0";
+    this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
+    this.id = "tank_" + Math.floor((Math.random() * 10000) + 1);
+}
+
+// Listen shell function
+Control.prototype.listen = function() {
+    var control = this;
+    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
 }
 
 Control.prototype.handleKey = function(event, isDown) {
     e = this.translateKeyEvent(event, isDown);
-
-    this.tanks["echo"].update(e);
     this.network.broadcast(e);
 }
 
 Control.prototype.translateKeyEvent = function(event, isDown) {
     var e = {};
-
-    e["tank_id"] = this.id;
-    e["game_id"] = this.game_id;
 
     // Thruster Control
     // Abort if no keypress change...
@@ -63,6 +64,7 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
             break;
     }
 
+    // Left and Right both down mean you go nowhere
     e["yaw"] = 0;
     if (this.keys["left"])  e["yaw"] += 1;
     if (this.keys["right"]) e["yaw"] -= 1;
@@ -79,13 +81,18 @@ Control.prototype.update = function(events) {
         var e = events[i];
 
         if (!(e._id in this.processed)) {
-            this.processed[e._id] = true;
+            this.processed[e._id] = e;
+
+            if (!(e.tank_id in this.tanks)) {
+                console.log("A new challenger appears!");
+                this.tanks[e.tank_id] = new Tank(this.render);
+            }
+
             this.tanks[e.tank_id].update(e);
         }
     }
 
-    var control = this;
-    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
+    this.listen();
 }
 
 Control.prototype.tick = function() {
@@ -119,24 +126,17 @@ Control.prototype.start = function() {
     document.onkeyup = function(event) {
         return control.handleKey(event, false); };
 
-    // Initialize Object Data
+    // Initialize Object
     this.map = new Map();
-    this.tanks[this.id] = new Tank(this.id);
-    this.tanks["echo"] = new Tank(this.id);
 
-    // Initialize Object Buffers 
     this.render.initShaders();
     this.map.initBuffers(this.render);
-
-    for (tank in this.tanks) {
-        this.tanks[tank].initBuffers(this.render);
-    }
+    this.tanks[this.id] = new Tank(this.render);
 
     this.render.initCanvas();
 
     // Start chattering
-    var control = this;
-    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
+    this.listen();
 
     // Start ticking
     this.tick();

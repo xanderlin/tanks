@@ -1,23 +1,29 @@
-// Wrapper for crosscloud
-function Network() {
+// Wrapper for messages that go across the network...
+function Network(control) {
     this.pod = crosscloud.connect();
-    this.messageCount = 0;
+    this.control = control;
 }
 
 Network.prototype.broadcast = function(e) {
+    e.tank_id = this.control.id;
+    e.game_id = this.control.game_id;
+
     this.pod.push(e);
 }
 
-Network.prototype.queryForEvents = function(id, callback) {
-    this.messageCount += 1;
-
+Network.prototype.queryForEvents = function(callback) {
     this.pod.query()
-        .filter({
-            tank_id: { "$exists": true },
-            game_id: id,
-            yaw: { "$exists": true },
-            thrust: { "$exists": true },
-        })
+        .filter(this.keyPressHash())
         .onAllResults(callback)
         .start();
 }
+
+Network.prototype.keyPressHash = function() {
+    return {
+        tank_id: { "$exists": true },
+        game_id: this.control.game_id,
+        yaw: { "$exists": true },
+        thrust: { "$exists": true }
+    }
+}
+
