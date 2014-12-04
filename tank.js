@@ -15,13 +15,8 @@ function Tank() {
 }
 
 Tank.prototype.update = function(e) {
-    if (e["yaw"] != 0) {
-        this.yawRate = e["down"] ? 0.1 * e["yaw"] : 0;
-    }
-
-    if (e["thrust"] != 0) {
-        this.speed = e["down"] ? 0.003 * e["thrust"] : 0;
-    }
+    this.yawRate = 0.1 * e["yaw"];
+    this.speed = 0.003 * e["thrust"];
 }
 
 Tank.prototype.initBuffers = function(render){
@@ -52,6 +47,9 @@ Tank.prototype.drawScene = function(render){
     var cubeVertexPositionBuffer = this.cubeVertexPositionBuffer;
     var cubeVertexColorBuffer = this.cubeVertexColorBuffer;
     var cubeVertexIndexBuffer = this.cubeVertexIndexBuffer;
+
+    // Save
+    render.mvPushMatrix();
 
     // Seek
     mat4.translate(render.mvMatrix, [this.xPos, this.yPos, this.zPos]);
@@ -93,6 +91,9 @@ Tank.prototype.drawScene = function(render){
     render.setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
+    render.mvPopMatrix();
+
+    // Revert
     render.mvPopMatrix();
 }
 

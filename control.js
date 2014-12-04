@@ -9,64 +9,67 @@
         Passing relevant information on to the render pipeline
 */
 
+// Start a new tank game instance
 function Control() {
+    // Storage structures
     this.canvasId = "tanks-canvas";
-
-    this.id = "tank_0";
-    this.game_id = 11;
 
     this.tanks = {};
     this.processed = {};
+    this.keys = {};
+
+    // Connect to the Network
+    this.network = new Network();
+
+    // Set id...?
+    this.game_id = 20;
+    this.id = "tank_0";
 }
 
 Control.prototype.handleKey = function(event, isDown) {
-    e = this.translateEvent(event, isDown);
+    e = this.translateKeyEvent(event, isDown);
 
     this.tanks["echo"].update(e);
     this.network.broadcast(e);
 }
 
-Control.prototype.translateEvent = function(event, isDown) {
+Control.prototype.translateKeyEvent = function(event, isDown) {
     var e = {};
 
     e["tank_id"] = this.id;
-    e["down"] = isDown;
     e["game_id"] = this.game_id;
 
     // Thruster Control
+    // Abort if no keypress change...
     switch(event.keyCode) {
         case 37:    // left
         case 65:    // A
-
-            e["yaw"] = 1;
-            e["thrust"] = 0;
+            this.keys["left"] = isDown;
             break;
 
         case 39:    // right
         case 68:    // D
-
-            e["yaw"] = -1;
-            e["thrust"] = 0;
+            this.keys["right"] = isDown;
             break;
 
         case 38:    // up
         case 87:    // W
-
-            e["yaw"] = 0;
-            e["thrust"] = 1;
+            this.keys["up"] = isDown;
             break;
 
         case 40:    // down
         case 83:    // S
-
-            e["yaw"] = 0;
-            e["thrust"] = -1;
+            this.keys["down"] = isDown;
             break;
-
-        default:
-            e["yaw"] = 0;
-            e["thrust"] = 0;
     }
+
+    e["yaw"] = 0;
+    if (this.keys["left"])  e["yaw"] += 1;
+    if (this.keys["right"]) e["yaw"] -= 1;
+
+    e["thrust"] = 0;
+    if (this.keys["up"])    e["thrust"] += 1;
+    if (this.keys["down"])  e["thrust"] -= 1;
 
     return e;
 }
@@ -92,13 +95,16 @@ Control.prototype.tick = function() {
 
     // Render scene
     this.render.drawScene();
-
     this.map.drawScene(this.render);
 
-    this.tanks[this.id].drawScene(this.render);
-    this.tanks["echo"].drawScene(this.render);
-    this.tanks[this.id].animate(this.render);
-    this.tanks["echo"].animate(this.render);
+    for (tank in this.tanks) {
+        this.tanks[tank].drawScene(this.render);
+    }
+
+    // Update data 
+    for (tank in this.tanks) {
+        this.tanks[tank].animate(this.render);
+    }
 }
 
 Control.prototype.start = function() {
@@ -118,15 +124,13 @@ Control.prototype.start = function() {
     this.tanks[this.id] = new Tank(this.id);
     this.tanks["echo"] = new Tank(this.id);
 
-    // Connect to the Network
-    this.network = new Network();
-
     // Initialize Object Buffers 
     this.render.initShaders();
-
     this.map.initBuffers(this.render);
-    this.tanks[this.id].initBuffers(this.render);
-    this.tanks["echo"].initBuffers(this.render);
+
+    for (tank in this.tanks) {
+        this.tanks[tank].initBuffers(this.render);
+    }
 
     this.render.initCanvas();
 

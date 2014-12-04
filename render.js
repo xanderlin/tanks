@@ -4,6 +4,7 @@ function Render() {
     // Camera settings
     this.cpitch = 0;
     this.cyaw = -0.1;
+
     this.cxPos = 0;
     this.cyPos = 10;
     this.czPos = 80;
