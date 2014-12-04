@@ -22,14 +22,15 @@ function Control() {
     this.network = new Network(this);
 
     // Set id...?
-    this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
+    this.game_id = "test_mp1"
+    //this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
     this.id = "tank_" + Math.floor((Math.random() * 10000) + 1);
 }
 
 // Listen shell function
 Control.prototype.listen = function() {
     var control = this;
-    this.network.queryForEvents(control.game_id, function(events){control.update(events)});
+    this.network.queryForEvents(function(events){control.update(events)});
 }
 
 Control.prototype.handleKey = function(event, isDown) {
