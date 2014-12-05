@@ -60,7 +60,6 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
     var e = {};
     var tank = this.tanks[this.id];
 
-    e["rTurret"] = tank.rTurret;
     e["rBody"] = tank.rBody;
 
     e["xPos"] = tank.xPos;

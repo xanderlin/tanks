@@ -28,7 +28,6 @@ Network.prototype.keyPressHash = function() {
         yaw: { "$exists": true },
         thrust: { "$exists": true },
 
-        rTurret: { "$exists": true },
         rBody: { "$exists": true },
 
         xPos: { "$exists": true },

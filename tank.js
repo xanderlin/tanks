@@ -30,7 +30,6 @@ Tank.prototype.moveTurret = function(e) {
 }
 
 Tank.prototype.moveBody = function(e) {
-    this.rTurret = e.rTurret;
     this.rBody = e.rBody;
 
     this.xPos = e.xPos;
