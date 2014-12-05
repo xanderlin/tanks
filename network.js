@@ -12,11 +12,19 @@ Network.prototype.broadcast = function(e) {
     this.pod.push(e);
 }
 
-Network.prototype.queryForEvents = function(callback) {
+Network.prototype.query = function(callback, hash) {
     this.pod.query()
-        .filter(this.keyPressHash())
+        .filter(hash)
         .onAllResults(callback)
         .start();
+}
+
+Network.prototype.queryKeys = function(callback) {
+    this.query(callback, this.keyPressHash());
+}
+
+Network.prototype.queryMice = function(callback) {
+    this.query(callback, this.mouseMoveHash());
 }
 
 Network.prototype.keyPressHash = function() {
@@ -36,3 +44,16 @@ Network.prototype.keyPressHash = function() {
     }
 }
 
+Network.prototype.mouseMoveHash = function() {
+    return {
+        tank_id: { "$exists": true },
+        game_id: this.control.game_id,
+        timestamp: { "$exists" : true },
+
+        rTurret: { "$exists" : true },
+        gunPitch: { "$exists" : true },
+
+        dYaw: { "$exists": true },
+        dPitch: { "$exists": true }
+    }
+}

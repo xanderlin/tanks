@@ -34,6 +34,9 @@ Tank.prototype.fire = function() {
 }
 
 Tank.prototype.moveTurret = function(e) {
+    this.rTurret = e.rTurret;
+    this.gunPitch = e.gunPitch;
+
     this.ytRate = 0.1 * e.dYaw;
     this.gpRate = 0.1 * e.dPitch;
 }

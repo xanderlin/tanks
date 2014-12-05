@@ -31,9 +31,21 @@ function Control() {
 }
 
 // Listen shell function
-Control.prototype.listen = function() {
+Control.prototype.listen = function(filter) {
     var control = this;
-    this.network.queryForEvents(function(events){control.update(events)});
+
+    if (filter === undefined) {    
+        this.network.queryKeys(function(events){control.updateKeys(events)});
+        this.network.queryMice(function(events){control.updateMice(events)});
+    }
+
+    if (filter === "Keys") {
+        this.network.queryKeys(function(events){control.updateKeys(events)});
+    }
+
+    if (filter === "Mice") {
+        this.network.queryMice(function(events){control.updateMice(events)});
+    }
 }
 
 Control.prototype.handleKey = function(event, isDown) {
@@ -48,11 +60,16 @@ Control.prototype.handleMouse = function(event) {
     var height = document.body.clientHeight / 2;
 
     var e = {}
+    var tank = this.tanks[this.id];
+
+    e["rTurret"] = tank.rTurret;
+    e["gunPitch"] = tank.gunPitch;
 
     e["dYaw"] = (width - event.pageX) / width;
     e["dPitch"] = (height - event.pageY) / height;
 
-    this.tanks[this.id].moveTurret(e);
+    tank.moveTurret(e);
+    this.network.broadcast(e);
 }
 
 Control.prototype.handleClick = function(event) {
@@ -107,14 +124,14 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
 
 // Updates the tanks with the events floating around the pods
 // We are only going to use the most recent event from each tank
-Control.prototype.update = function(events) {
+Control.prototype.update = function(events, context) {
     var queue = {};
 
     // Extract most recent events
     for (var i = 0; i < events.length; i++) {
         var e = events[i];
 
-        // Your tank is bound directly to keys
+        // Your tank is bound directly to user input
         if (e.tank_id == this.id) {
             continue;
         }
@@ -140,14 +157,28 @@ Control.prototype.update = function(events) {
                 this.tanks[tank_id] = new Tank(this);
             }
 
-            this.tanks[tank_id].moveBody(e);
+            if (context === "Keys") {
+                this.tanks[tank_id].moveBody(e);
+            }
+
+            if (context === "Mice") {
+                this.tanks[tank_id].moveTurret(e);
+            }
         }
     }
 
     //Debug Only
     this.queue = queue;
 
-    this.listen();
+    this.listen(context);
+}
+
+Control.prototype.updateKeys = function(events) {
+    this.update(events, "Keys");
+}
+
+Control.prototype.updateMice = function(events) {
+    this.update(events, "Mice");
 }
 
 Control.prototype.tick = function() {
