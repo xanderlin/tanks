@@ -26,7 +26,7 @@ Tank.prototype.update = function(e) {
     this.yawRate = 0.1 * e.yaw;
     this.speed = 0.003 * e.thrust;
 
-    if (e.timestamp != null) this.lastTime = e.timestamp;
+    //if (e.timestamp != null) this.lastTime = e.timestamp;
 }
 
 Tank.prototype.initBuffers = function(render){

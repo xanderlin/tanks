@@ -23,7 +23,7 @@ function Control() {
 
     // Set id...?
     this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
-    this.game_id = "test_mp_8"
+    this.game_id = "test_mp_10"
     this.id = "tank_" + Math.floor((Math.random() * 10000) + 1);
 }
 
@@ -89,8 +89,6 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
 // Updates the tanks with the events floating around the pods
 // We are only going to use the most recent event from each tank
 Control.prototype.update = function(events) {
-    console.log(events.length);
-
     var queue = {};
 
     for (var i = 0; i < events.length; i++) {
@@ -126,6 +124,9 @@ Control.prototype.update = function(events) {
             this.tanks[tank_id].update(e);
         }
     }
+
+    //Debug Only
+    this.queue = queue;
 
     this.listen();
 }
