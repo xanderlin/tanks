@@ -1,7 +1,7 @@
 function Render() {
     this.initMatrix();
 
-    // Camera settings
+    // Absolute camera position 
     this.cpitch = 0;
     this.cyaw = -0.1;
 
@@ -9,6 +9,7 @@ function Render() {
     this.cyPos = 10;
     this.czPos = 80;
 
+    // Function for camera binding
     this.camera = false;
 }
 
@@ -16,7 +17,7 @@ Render.prototype.bindCamera = function(tank) {
     var render = this;
 
     this.camera = function() {
-        render.cyaw = tank.rBody;
+        render.cyaw = tank.rTurret;
 
         render.cxPos = tank.xPos;
         render.cyPos = 1.5;
@@ -26,6 +27,9 @@ Render.prototype.bindCamera = function(tank) {
 
 Render.prototype.initGL = function(canvasId) {
     var canvas = document.getElementById(canvasId);
+
+    canvas.width = document.body.clientWidth;
+    canvas.height = document.body.clientHeight;
 
     try {
         this.gl = canvas.getContext("webgl");

@@ -1,8 +1,12 @@
 function Tank(control) {
+    this.gunPitch = 0;
     this.rTurret = 0;
     this.rBody = 0;
 
     this.speed = 0;
+
+    this.ytRate = 0;
+    this.gpRate = 0;
 
     this.yawRate = 0;
 
@@ -20,7 +24,12 @@ Tank.prototype.fire = function() {
     // register shot with control
 }
 
-Tank.prototype.update = function(e) {
+Tank.prototype.moveTurret = function(e) {
+    this.ytRate = 0.1 * e.dYaw;
+    this.gpRate = 0.1 * e.dPitch;
+}
+
+Tank.prototype.moveBody = function(e) {
     this.rTurret = e.rTurret;
     this.rBody = e.rBody;
 
@@ -118,6 +127,9 @@ Tank.prototype.animate = function(render) {
         }
 
         this.rBody += this.yawRate * elapsed;
+
+        this.rTurret += this.ytRate * elapsed;
+        this.gunPitch += this.gpRate * elapsed;
     }
 
     this.lastTime = timeNow;

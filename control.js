@@ -38,8 +38,22 @@ Control.prototype.listen = function() {
 
 Control.prototype.handleKey = function(event, isDown) {
     e = this.translateKeyEvent(event, isDown);
-    this.tanks[this.id].update(e);
+    this.tanks[this.id].moveBody(e);
     this.network.broadcast(e);
+}
+
+// Mouse movements!
+Control.prototype.handleMouse = function(event) {
+    // What's old IE support anyway.
+    var width = document.body.clientWidth / 2;
+    var height = document.body.clientHeight / 2;
+
+    var e = {}
+
+    e["dYaw"] = (width - event.pageX) / width;
+    e["dPitch"] = (height - event.pageY) / height;
+
+    this.tanks[this.id].moveTurret(e);
 }
 
 Control.prototype.translateKeyEvent = function(event, isDown) {
@@ -124,7 +138,7 @@ Control.prototype.update = function(events) {
                 this.tanks[tank_id] = new Tank(this);
             }
 
-            this.tanks[tank_id].update(e);
+            this.tanks[tank_id].moveBody(e);
         }
     }
 
@@ -173,10 +187,14 @@ Control.prototype.start = function() {
 
     // Bind Controls
     var control = this;
+
     document.onkeydown = function(event) {
         return control.handleKey(event, true); };
     document.onkeyup = function(event) {
         return control.handleKey(event, false); };
+
+    document.onmousemove = function(event) {
+        return control.handleMouse(event); };
 
     // Initialize Object
     this.map = new Map();
