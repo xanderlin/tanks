@@ -1,4 +1,4 @@
-function Tank(render) {
+function Tank(control) {
     this.rTurret = 0;
     this.rBody = 0;
 
@@ -12,7 +12,12 @@ function Tank(render) {
 
     this.lastTime = 0;
 
-    this.initBuffers(render);
+    this.control = control;
+    this.initBuffers(control.render);
+}
+
+Tank.prototype.fire = function() {
+    // register shot with control
 }
 
 Tank.prototype.update = function(e) {
@@ -26,7 +31,7 @@ Tank.prototype.update = function(e) {
     this.yawRate = 0.1 * e.yaw;
     this.speed = 0.003 * e.thrust;
 
-    //if (e.timestamp != null) this.lastTime = e.timestamp;
+    if (e.timestamp != null) this.lastTime = e.timestamp;
 }
 
 Tank.prototype.initBuffers = function(render){
@@ -57,9 +62,6 @@ Tank.prototype.drawScene = function(render){
     var bodyVertexPositionBuffer = this.bodyVertexPositionBuffer;
     var bodyVertexColorBuffer = this.bodyVertexColorBuffer;
     var bodyVertexIndexBuffer = this.bodyVertexIndexBuffer;
-
-    // Save
-    render.mvPushMatrix();
 
     // Seek
     mat4.translate(render.mvMatrix, [this.xPos, this.yPos, this.zPos]);
@@ -102,9 +104,6 @@ Tank.prototype.drawScene = function(render){
     gl.drawElements(gl.TRIANGLES, bodyVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
     render.mvPopMatrix();
-
-    // Revert
-    render.mvPopMatrix();
 }
 
 Tank.prototype.animate = function(render) {
@@ -119,8 +118,6 @@ Tank.prototype.animate = function(render) {
         }
 
         this.rBody += this.yawRate * elapsed;
-
-        this.rTurret += (90 * elapsed) / 1000.0;
     }
 
     this.lastTime = timeNow;

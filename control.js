@@ -11,10 +11,13 @@
 
 // Start a new tank game instance
 function Control() {
-    // Storage structures
     this.canvasId = "tanks-canvas";
 
+    // Object storage structures
     this.tanks = {};
+    this.shots = {};
+
+    // Network and input state
     this.processed = {};
     this.keys = {};
 
@@ -91,10 +94,11 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
 Control.prototype.update = function(events) {
     var queue = {};
 
+    // Extract most recent events
     for (var i = 0; i < events.length; i++) {
         var e = events[i];
 
-        // Your tank is bound to keys
+        // Your tank is bound directly to keys
         if (e.tank_id == this.id) {
             continue;
         }
@@ -108,8 +112,7 @@ Control.prototype.update = function(events) {
         }
     }
    
-    // This will double process events...
-    // TODO make double processing okay. 
+    // Process unseen updates
     for (tank_id in queue) {
         var e = queue[tank_id];
 
@@ -118,7 +121,7 @@ Control.prototype.update = function(events) {
 
             if (!(tank_id in this.tanks)) {
                 console.log("A new challenger appears!");
-                this.tanks[tank_id] = new Tank(this.render);
+                this.tanks[tank_id] = new Tank(this);
             }
 
             this.tanks[tank_id].update(e);
@@ -142,12 +145,24 @@ Control.prototype.tick = function() {
     this.map.drawScene(this.render);
 
     for (tank in this.tanks) {
+        this.render.mvPushMatrix();
         this.tanks[tank].drawScene(this.render);
+        this.render.mvPopMatrix();
+    }
+
+    for (shot in this.shots) {
+        this.render.mvPushMatrix();
+        this.shots[shot].drawScene(this.render);
+        this.render.mvPopMatrix();
     }
 
     // Update data 
     for (tank in this.tanks) {
         this.tanks[tank].animate(this.render);
+    }
+
+    for (shot in this.shots) {
+        this.shots[shot].animate(this.render);
     }
 }
 
@@ -168,7 +183,7 @@ Control.prototype.start = function() {
 
     this.render.initShaders();
     this.map.initBuffers(this.render);
-    this.tanks[this.id] = new Tank(this.render);
+    this.tanks[this.id] = new Tank(this);
 
     this.render.initCanvas();
     this.render.bindCamera(this.tanks[this.id]);
