@@ -37,6 +37,7 @@ Control.prototype.listen = function(filter) {
     if (filter === undefined) {    
         this.network.queryKeys(function(events){control.updateKeys(events)});
         this.network.queryMice(function(events){control.updateMice(events)});
+        this.network.queryShot(function(events){control.updateShot(events)});
     }
 
     if (filter === "Keys") {
@@ -45,6 +46,10 @@ Control.prototype.listen = function(filter) {
 
     if (filter === "Mice") {
         this.network.queryMice(function(events){control.updateMice(events)});
+    }
+
+    if (filter === "Shot") {
+        this.network.queryShot(function(events){control.updateShot(events)});
     }
 }
 
@@ -73,7 +78,17 @@ Control.prototype.handleMouse = function(event) {
 }
 
 Control.prototype.handleClick = function(event) {
-    this.tanks[this.id].fire();
+    var tank = this.tanks[this.id];
+    var e = {};
+
+    e["rTurret"] = tank.rTurret;
+    e["gunPitch"] = tank.gunPitch;
+
+    e["xPos"] = tank.xPos;
+    e["zPos"] = tank.zPos;
+
+    this.tanks[this.id].fire(e);
+    this.network.broadcast(e);
 }
 
 Control.prototype.translateKeyEvent = function(event, isDown) {
@@ -164,6 +179,10 @@ Control.prototype.update = function(events, context) {
             if (context === "Mice") {
                 this.tanks[tank_id].moveTurret(e);
             }
+
+            if (context === "Shot") {
+                this.tanks[tank_id].fire(e);
+            }
         }
     }
 
@@ -179,6 +198,10 @@ Control.prototype.updateKeys = function(events) {
 
 Control.prototype.updateMice = function(events) {
     this.update(events, "Mice");
+}
+
+Control.prototype.updateShot = function(events) {
+    this.update(events, "Shot");
 }
 
 Control.prototype.tick = function() {

@@ -21,17 +21,18 @@ function Tank(control) {
     this.initBuffers(control.render);
 }
 
-Tank.prototype.fire = function() {
+Tank.prototype.fire = function(e) {
     var curTime = Date.now();
     if (curTime - this.lastShot > 1000) {
         this.lastShot = curTime;
-        console.log("Boom.");
+        console.log("Boom!");
 
         // register shot with control
-        var shot = new Shot(this.control.render, this);
+
+        var shot = new Shot(this.control.render, e);
         this.control.shots[curTime + "_" + this.control.id] = shot;
     } else {
-        console.log("Click - ");
+        console.log("Click--");
     }
 }
 

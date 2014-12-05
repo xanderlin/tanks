@@ -1,14 +1,14 @@
-function Shot(render, tank) {
+function Shot(render, e) {
     this.speed = 0.01;
 
-    this.pitch = tank.gunPitch;
-    this.yaw = tank.rTurret;
+    this.pitch = e.gunPitch;
+    this.yaw = e.rTurret;
 
     this.rBody = 0;
 
-    this.xPos = tank.xPos;
+    this.xPos = e.xPos;
     this.yPos = 1;
-    this.zPos = tank.zPos;
+    this.zPos = e.zPos;
 
     this.lastTime = 0;
 

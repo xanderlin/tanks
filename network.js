@@ -27,6 +27,10 @@ Network.prototype.queryMice = function(callback) {
     this.query(callback, this.mouseMoveHash());
 }
 
+Network.prototype.queryShot = function(callback) {
+    this.query(callback, this.shotHash());
+}
+
 Network.prototype.keyPressHash = function() {
     return {
         tank_id: { "$exists": true },
@@ -55,5 +59,19 @@ Network.prototype.mouseMoveHash = function() {
 
         dYaw: { "$exists": true },
         dPitch: { "$exists": true }
+    }
+}
+
+Network.prototype.shotHash = function() {
+    return {
+        tank_id: { "$exists": true },
+        game_id: this.control.game_id,
+        timestamp: { "$exists" : true },
+
+        rTurret: { "$exists" : true },
+        gunPitch: { "$exists" : true },
+
+        xPos: { "$exists": true },
+        zPos: { "$exists": true }
     }
 }
