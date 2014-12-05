@@ -15,13 +15,22 @@ function Tank(control) {
     this.zPos = 0;
 
     this.lastTime = 0;
+    this.lastShot = 0;
 
     this.control = control;
     this.initBuffers(control.render);
 }
 
 Tank.prototype.fire = function() {
-    // register shot with control
+    var curTime = Date.now();
+    if (curTime - this.lastShot > 1000) {
+        this.lastShot = curTime;
+        console.log("Boom.");
+
+        // register shot with control
+    } else {
+        console.log("Click - ");
+    }
 }
 
 Tank.prototype.moveTurret = function(e) {

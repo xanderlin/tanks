@@ -42,7 +42,6 @@ Control.prototype.handleKey = function(event, isDown) {
     this.network.broadcast(e);
 }
 
-// Mouse movements!
 Control.prototype.handleMouse = function(event) {
     // What's old IE support anyway.
     var width = document.body.clientWidth / 2;
@@ -54,6 +53,10 @@ Control.prototype.handleMouse = function(event) {
     e["dPitch"] = (height - event.pageY) / height;
 
     this.tanks[this.id].moveTurret(e);
+}
+
+Control.prototype.handleClick = function(event) {
+    this.tanks[this.id].fire();
 }
 
 Control.prototype.translateKeyEvent = function(event, isDown) {
@@ -194,6 +197,8 @@ Control.prototype.start = function() {
 
     document.onmousemove = function(event) {
         return control.handleMouse(event); };
+    document.onclick = function(event) {
+        return control.handleClick(event); };
 
     // Initialize Object
     this.map = new Map();
