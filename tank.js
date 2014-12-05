@@ -28,6 +28,8 @@ Tank.prototype.fire = function() {
         console.log("Boom.");
 
         // register shot with control
+        var shot = new Shot(this.control.render, this);
+        this.control.shots[curTime + "_" + this.control.id] = shot;
     } else {
         console.log("Click - ");
     }
