@@ -22,8 +22,8 @@ function Control() {
     this.network = new Network(this);
 
     // Set id...?
-    this.game_id = "test_mp1"
-    //this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
+    this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
+    this.game_id = "test_mp_8"
     this.id = "tank_" + Math.floor((Math.random() * 10000) + 1);
 }
 
@@ -35,11 +35,20 @@ Control.prototype.listen = function() {
 
 Control.prototype.handleKey = function(event, isDown) {
     e = this.translateKeyEvent(event, isDown);
+    this.tanks[this.id].update(e);
     this.network.broadcast(e);
 }
 
 Control.prototype.translateKeyEvent = function(event, isDown) {
     var e = {};
+    var tank = this.tanks[this.id];
+
+    e["rTurret"] = tank.rTurret;
+    e["rBody"] = tank.rBody;
+
+    e["xPos"] = tank.xPos;
+    e["yPos"] = tank.yPos;
+    e["zPos"] = tank.zPos;
 
     // Thruster Control
     // Abort if no keypress change...
@@ -77,19 +86,44 @@ Control.prototype.translateKeyEvent = function(event, isDown) {
     return e;
 }
 
+// Updates the tanks with the events floating around the pods
+// We are only going to use the most recent event from each tank
 Control.prototype.update = function(events) {
+    console.log(events.length);
+
+    var queue = {};
+
     for (var i = 0; i < events.length; i++) {
         var e = events[i];
 
-        if (!(e._id in this.processed)) {
-            this.processed[e._id] = e;
+        // Your tank is bound to keys
+        if (e.tank_id == this.id) {
+            continue;
+        }
 
-            if (!(e.tank_id in this.tanks)) {
+        if (!(e.tank_id in queue)) {
+            queue[e.tank_id] = e;
+        }
+
+        if (queue[e.tank_id].timestamp < e.timestamp) {
+            queue[e.tank_id] = e;
+        }
+    }
+   
+    // This will double process events...
+    // TODO make double processing okay. 
+    for (tank_id in queue) {
+        var e = queue[tank_id];
+
+        if (!(e._id in this.processed)) {
+            this.processed[e._id] = true;
+
+            if (!(tank_id in this.tanks)) {
                 console.log("A new challenger appears!");
-                this.tanks[e.tank_id] = new Tank(this.render);
+                this.tanks[tank_id] = new Tank(this.render);
             }
 
-            this.tanks[e.tank_id].update(e);
+            this.tanks[tank_id].update(e);
         }
     }
 

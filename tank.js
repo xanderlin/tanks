@@ -3,7 +3,6 @@ function Tank(render) {
     this.rBody = 0;
 
     this.speed = 0;
-    this.yaw = 0;
 
     this.yawRate = 0;
 
@@ -17,8 +16,17 @@ function Tank(render) {
 }
 
 Tank.prototype.update = function(e) {
-    this.yawRate = 0.1 * e["yaw"];
-    this.speed = 0.003 * e["thrust"];
+    this.rTurret = e.rTurret;
+    this.rBody = e.rBody;
+
+    this.xPos = e.xPos;
+    this.yPos = e.yPos;
+    this.zPos = e.zPos;
+
+    this.yawRate = 0.1 * e.yaw;
+    this.speed = 0.003 * e.thrust;
+
+    if (e.timestamp != null) this.lastTime = e.timestamp;
 }
 
 Tank.prototype.initBuffers = function(render){
@@ -100,20 +108,19 @@ Tank.prototype.drawScene = function(render){
 }
 
 Tank.prototype.animate = function(render) {
-    var timeNow = new Date().getTime();
+    var timeNow = Date.now();
 
     if (this.lastTime != 0) {
         var elapsed = timeNow - this.lastTime;
 
         if (this.speed != 0) {
-            this.xPos -= Math.sin(render.degToRad(this.yaw)) * this.speed * elapsed;
-            this.zPos -= Math.cos(render.degToRad(this.yaw)) * this.speed * elapsed;
+            this.xPos -= Math.sin(render.degToRad(this.rBody)) * this.speed * elapsed;
+            this.zPos -= Math.cos(render.degToRad(this.rBody)) * this.speed * elapsed;
         }
 
-        this.yaw += this.yawRate * elapsed;
+        this.rBody += this.yawRate * elapsed;
 
         this.rTurret += (90 * elapsed) / 1000.0;
-        this.rBody = this.yaw;
     }
 
     this.lastTime = timeNow;

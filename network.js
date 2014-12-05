@@ -7,6 +7,7 @@ function Network(control) {
 Network.prototype.broadcast = function(e) {
     e.tank_id = this.control.id;
     e.game_id = this.control.game_id;
+    e.timestamp = Date.now();
 
     this.pod.push(e);
 }
@@ -22,8 +23,17 @@ Network.prototype.keyPressHash = function() {
     return {
         tank_id: { "$exists": true },
         game_id: this.control.game_id,
+        timestamp: { "$exists" : true },
+
         yaw: { "$exists": true },
-        thrust: { "$exists": true }
+        thrust: { "$exists": true },
+
+        rTurret: { "$exists": true },
+        rBody: { "$exists": true },
+
+        xPos: { "$exists": true },
+        yPos: { "$exists": true },
+        zPos: { "$exists": true }
     }
 }
 
