@@ -8,6 +8,20 @@ function Render() {
     this.cxPos = 0;
     this.cyPos = 10;
     this.czPos = 80;
+
+    this.camera = false;
+}
+
+Render.prototype.bindCamera = function(tank) {
+    var render = this;
+
+    this.camera = function() {
+        render.cyaw = tank.rBody;
+
+        render.cxPos = tank.xPos;
+        render.cyPos = 1.5;
+        render.czPos = tank.zPos;
+    }
 }
 
 Render.prototype.initGL = function(canvasId) {
@@ -144,6 +158,10 @@ Render.prototype.drawScene = function() {
 
     // SETUP CAMERA
     mat4.identity(this.mvMatrix);
+
+    if (this.camera !== false){
+        this.camera();
+    }
 
     mat4.rotate(this.mvMatrix, this.degToRad(-this.cpitch), [1, 0, 0]);
     mat4.rotate(this.mvMatrix, this.degToRad(-this.cyaw), [0, 1, 0]);

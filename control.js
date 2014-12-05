@@ -138,6 +138,7 @@ Control.prototype.tick = function() {
 
     // Render scene
     this.render.drawScene();
+
     this.map.drawScene(this.render);
 
     for (tank in this.tanks) {
@@ -170,6 +171,7 @@ Control.prototype.start = function() {
     this.tanks[this.id] = new Tank(this.render);
 
     this.render.initCanvas();
+    this.render.bindCamera(this.tanks[this.id]);
 
     // Start chattering
     this.listen();
