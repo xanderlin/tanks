@@ -1,4 +1,5 @@
 function Shot(render, e) {
+    this.tank_id = e.tank_id;
     this.speed = 0.01;
 
     this.pitch = e.gunPitch;

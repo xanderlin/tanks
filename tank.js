@@ -1,4 +1,6 @@
-function Tank(control) {
+function Tank(control, id) {
+    this.id = id;
+
     this.gunPitch = 45;
     this.rTurret = 0;
     this.rBody = 0;
@@ -6,9 +8,7 @@ function Tank(control) {
     this.hitbox = 0.75;
 
     this.speed = 0;
-
     this.ytRate = 0;
-
     this.yawRate = 0;
 
     this.xPos = 0;
@@ -26,6 +26,8 @@ Tank.prototype.fire = function(e) {
     var curTime = Date.now();
     if (curTime - this.lastShot > 1000) {
         this.lastShot = curTime;
+
+        e.tank_id = this.id;
 
         var shot = new Shot(this.control.render, e);
         this.control.shots[curTime + "_" + this.control.id] = shot;
