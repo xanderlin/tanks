@@ -26,7 +26,7 @@ function Control() {
 
     // Set id...?
     this.game_id = "test_" + Math.floor((Math.random() * 10000) + 1);
-    this.game_id = "test_mp_10"
+    this.game_id = "test_mp_11"
     this.id = "tank_" + Math.floor((Math.random() * 10000) + 1);
 }
 
@@ -208,7 +208,12 @@ Control.prototype.tick = function() {
     }
 
     // Update data 
-    this.tanks[tank].process(this.shots);
+    for (tank in this.tanks) {
+        var shot = this.tanks[tank].process(this.shots);
+        if (shot) {
+            console.log(tank + " was hit.");
+        }
+    }
 
     for (tank in this.tanks) {
         this.tanks[tank].animate(this.render);

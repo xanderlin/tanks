@@ -1,5 +1,5 @@
 function Tank(control) {
-    this.gunPitch = 0;
+    this.gunPitch = 45;
     this.rTurret = 0;
     this.rBody = 0;
 
@@ -8,7 +8,6 @@ function Tank(control) {
     this.speed = 0;
 
     this.ytRate = 0;
-    this.gpRate = 0;
 
     this.yawRate = 0;
 
@@ -27,14 +26,9 @@ Tank.prototype.fire = function(e) {
     var curTime = Date.now();
     if (curTime - this.lastShot > 1000) {
         this.lastShot = curTime;
-        console.log("Boom!");
-
-        // register shot with control
 
         var shot = new Shot(this.control.render, e);
         this.control.shots[curTime + "_" + this.control.id] = shot;
-    } else {
-        console.log("Click--");
     }
 }
 
@@ -43,7 +37,7 @@ Tank.prototype.moveTurret = function(e) {
     this.gunPitch = e.gunPitch;
 
     this.ytRate = 0.1 * e.dYaw;
-    this.gpRate = 0.1 * e.dPitch;
+    this.gunPitch = 25 + 20 * e.dPitch;
 }
 
 Tank.prototype.moveBody = function(e) {
@@ -70,9 +64,8 @@ Tank.prototype.process = function(shots) {
         var dist = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2) + Math.pow(dZ, 2));
 
         if (dist < this.hitbox) {
-            console.log("Another one bites the dust.");
-
             // Deal with your death. Isn't that tragic?
+            return shot;
         }
     }
 
@@ -165,7 +158,6 @@ Tank.prototype.animate = function(render) {
         this.rBody += this.yawRate * elapsed;
 
         this.rTurret += this.ytRate * elapsed;
-        this.gunPitch += this.gpRate * elapsed;
     }
 
     this.lastTime = timeNow;
